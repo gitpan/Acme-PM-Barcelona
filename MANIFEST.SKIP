@@ -1,4 +1,5 @@
 \.git
 blib
 .*\.bak
-t/boilerplate.t
+.*\.old
+Acme-PM-Barcelona-.*

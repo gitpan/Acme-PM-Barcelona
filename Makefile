@@ -17,11 +17,10 @@
 #     NAME => q[Acme::PM::Barcelona]
 #     NO_META => q[1]
 #     PL_FILES => {  }
-#     PREREQ_PM => { Test::More=>q[0], ExtUtils::MakeMaker=>q[6.42] }
-#     VERSION => q[0.01]
-#     clean => { FILES=>q[META.yml] }
+#     PREREQ_PM => { DateTime::Event::ICal=>q[0], DateTime=>q[0], Test::More=>q[0], DateTime::Set=>q[0], ExtUtils::MakeMaker=>q[6.42] }
+#     VERSION => q[0.02]
 #     dist => { PREOP=>q[$(PERL) -I. "-MModule::Install::Admin" -e "dist_preop(q($(DISTVNAME)))"] }
-#     test => { TESTS=>q[t/00-load.t t/boilerplate.t t/pod-coverage.t t/pod.t] }
+#     test => { TESTS=>q[t/00-load.t t/meeting.t t/pod-coverage.t t/pod.t] }
 
 # --- MakeMaker post_initialize section:
 
@@ -61,11 +60,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Acme::PM::Barcelona
 NAME_SYM = Acme_PM_Barcelona
-VERSION = 0.01
+VERSION = 0.02
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_01
+VERSION_SYM = 0_02
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.01
+XS_VERSION = 0.02
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -164,7 +163,8 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = lib/Acme/PM/Barcelona.pm
+MAN3PODS = lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/Meeting.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
@@ -186,10 +186,13 @@ PERL_ARCHIVE       =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/Acme/PM/Barcelona.pm
+TO_INST_PM = lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/Meeting.pm
 
 PM_TO_BLIB = lib/Acme/PM/Barcelona.pm \
-	blib/lib/Acme/PM/Barcelona.pm
+	blib/lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/Meeting.pm \
+	blib/lib/Acme/PM/Barcelona/Meeting.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -256,7 +259,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Acme-PM-Barcelona
-DISTVNAME = Acme-PM-Barcelona-0.01
+DISTVNAME = Acme-PM-Barcelona-0.02
 
 
 # --- MakeMaker macro section:
@@ -409,9 +412,11 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all  \
-	lib/Acme/PM/Barcelona.pm
+	lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/Meeting.pm
 	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) \
-	  lib/Acme/PM/Barcelona.pm $(INST_MAN3DIR)/Acme::PM::Barcelona.$(MAN3EXT) 
+	  lib/Acme/PM/Barcelona.pm $(INST_MAN3DIR)/Acme::PM::Barcelona.$(MAN3EXT) \
+	  lib/Acme/PM/Barcelona/Meeting.pm $(INST_MAN3DIR)/Acme::PM::Barcelona::Meeting.$(MAN3EXT) 
 
 
 
@@ -454,7 +459,7 @@ clean :: clean_subdirs
 	  perl.exe so_locations \
 	  $(BASEEXT).exp 
 	- $(RM_RF) \
-	  META.yml blib 
+	  blib 
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
 
 
@@ -715,7 +720,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 TEST_VERBOSE=0
 TEST_TYPE=test_$(LINKTYPE)
 TEST_FILE = test.pl
-TEST_FILES = t/00-load.t t/boilerplate.t t/pod-coverage.t t/pod.t
+TEST_FILES = t/00-load.t t/meeting.t t/pod-coverage.t t/pod.t
 TESTDB_SW = -d
 
 testdb :: testdb_$(LINKTYPE)
@@ -741,11 +746,14 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,01,0,0">' > $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,02,0,0">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <TITLE>$(DISTNAME)</TITLE>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Talks and projects by Barcelona.pm</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Alex Muntada &lt;alexm@cpan.org&gt;</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="DateTime" VERSION="0,0,0,0" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="DateTime-Event-ICal" VERSION="0,0,0,0" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="DateTime-Set" VERSION="0,0,0,0" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="ExtUtils-MakeMaker" VERSION="6,42,0,0" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Test-More" VERSION="0,0,0,0" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <OS NAME="$(OSNAME)" />' >> $(DISTNAME).ppd
@@ -759,7 +767,8 @@ ppd :
 
 pm_to_blib : $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', '\''$(PM_FILTER)'\'')' -- \
-	  lib/Acme/PM/Barcelona.pm blib/lib/Acme/PM/Barcelona.pm 
+	  lib/Acme/PM/Barcelona.pm blib/lib/Acme/PM/Barcelona.pm \
+	  lib/Acme/PM/Barcelona/Meeting.pm blib/lib/Acme/PM/Barcelona/Meeting.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
