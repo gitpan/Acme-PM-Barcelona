@@ -18,8 +18,9 @@
 #     NO_META => q[1]
 #     PL_FILES => {  }
 #     PREREQ_PM => { DateTime::Event::ICal=>q[0], DateTime=>q[0], Test::More=>q[0], DateTime::Set=>q[0], ExtUtils::MakeMaker=>q[6.42] }
-#     VERSION => q[0.02]
+#     VERSION => q[0.03]
 #     dist => { PREOP=>q[$(PERL) -I. "-MModule::Install::Admin" -e "dist_preop(q($(DISTVNAME)))"] }
+#     realclean => { FILES=>q[MYMETA.yml] }
 #     test => { TESTS=>q[t/00-load.t t/meeting.t t/pod-coverage.t t/pod.t] }
 
 # --- MakeMaker post_initialize section:
@@ -41,7 +42,7 @@ FULL_AR = /usr/bin/ar
 LD = cc
 LDDLFLAGS = -shared -O2 -g -L/usr/local/lib
 LDFLAGS =  -L/usr/local/lib
-LIBC = /lib/libc-2.9.so
+LIBC = /lib/libc-2.10.1.so
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
@@ -60,11 +61,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Acme::PM::Barcelona
 NAME_SYM = Acme_PM_Barcelona
-VERSION = 0.02
+VERSION = 0.03
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_02
+VERSION_SYM = 0_03
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.02
+XS_VERSION = 0.03
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -164,6 +165,7 @@ O_FILES  =
 H_FILES  = 
 MAN1PODS = 
 MAN3PODS = lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/12x5_ca.pod \
 	lib/Acme/PM/Barcelona/Meeting.pm
 
 # Where is the Config information that we are using/depend on
@@ -187,10 +189,13 @@ PERL_ARCHIVE_AFTER =
 
 
 TO_INST_PM = lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/12x5_ca.pod \
 	lib/Acme/PM/Barcelona/Meeting.pm
 
 PM_TO_BLIB = lib/Acme/PM/Barcelona.pm \
 	blib/lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/12x5_ca.pod \
+	blib/lib/Acme/PM/Barcelona/12x5_ca.pod \
 	lib/Acme/PM/Barcelona/Meeting.pm \
 	blib/lib/Acme/PM/Barcelona/Meeting.pm
 
@@ -259,7 +264,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Acme-PM-Barcelona
-DISTVNAME = Acme-PM-Barcelona-0.02
+DISTVNAME = Acme-PM-Barcelona-0.03
 
 
 # --- MakeMaker macro section:
@@ -413,9 +418,11 @@ POD2MAN = $(POD2MAN_EXE)
 
 manifypods : pure_all  \
 	lib/Acme/PM/Barcelona.pm \
+	lib/Acme/PM/Barcelona/12x5_ca.pod \
 	lib/Acme/PM/Barcelona/Meeting.pm
 	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) \
 	  lib/Acme/PM/Barcelona.pm $(INST_MAN3DIR)/Acme::PM::Barcelona.$(MAN3EXT) \
+	  lib/Acme/PM/Barcelona/12x5_ca.pod $(INST_MAN3DIR)/Acme::PM::Barcelona::12x5_ca.$(MAN3EXT) \
 	  lib/Acme/PM/Barcelona/Meeting.pm $(INST_MAN3DIR)/Acme::PM::Barcelona::Meeting.$(MAN3EXT) 
 
 
@@ -474,7 +481,7 @@ realclean purge ::  clean realclean_subdirs
 	- $(RM_F) \
 	  $(MAKEFILE_OLD) $(FIRST_MAKEFILE) 
 	- $(RM_RF) \
-	  $(DISTVNAME) 
+	  MYMETA.yml $(DISTVNAME) 
 
 
 # --- MakeMaker metafile section:
@@ -746,7 +753,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,02,0,0">' > $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,03,0,0">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <TITLE>$(DISTNAME)</TITLE>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Talks and projects by Barcelona.pm</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Alex Muntada &lt;alexm@cpan.org&gt;</AUTHOR>' >> $(DISTNAME).ppd
@@ -768,6 +775,7 @@ ppd :
 pm_to_blib : $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', '\''$(PM_FILTER)'\'')' -- \
 	  lib/Acme/PM/Barcelona.pm blib/lib/Acme/PM/Barcelona.pm \
+	  lib/Acme/PM/Barcelona/12x5_ca.pod blib/lib/Acme/PM/Barcelona/12x5_ca.pod \
 	  lib/Acme/PM/Barcelona/Meeting.pm blib/lib/Acme/PM/Barcelona/Meeting.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
@@ -779,13 +787,14 @@ pm_to_blib : $(TO_INST_PM)
 
 
 # End.
-# Postamble by Module::Install 0.77
+# Postamble by Module::Install 0.91
 # --- Module::Install::Admin::Makefile section:
 
 realclean purge ::
 	$(RM_F) $(DISTVNAME).tar$(SUFFIX)
-	$(RM_RF) inc MANIFEST.bak _build
-	$(PERL) -I. "-MModule::Install::Admin" -e "remove_meta()"
+	$(RM_F) MANIFEST.bak _build
+	$(PERL) "-Ilib" "-MModule::Install::Admin" -e "remove_meta()"
+	$(RM_RF) inc
 
 reset :: purge
 
